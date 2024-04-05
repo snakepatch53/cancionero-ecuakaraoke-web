@@ -38,12 +38,10 @@ export async function showSongs(id) {
     return response;
 }
 
-export async function searchSongs(pageUrl, data) {
+export async function searchSongs(pageUrl, search) {
     const response = await fetchAdapter({
-        resource: pageUrl ? pageUrl : _API_URL + "songs/search",
+        resource: pageUrl ? pageUrl : _API_URL + "songs/search/" + search,
         // printResponse: true,
-        data,
-        method: "POST",
     });
     return response;
 }

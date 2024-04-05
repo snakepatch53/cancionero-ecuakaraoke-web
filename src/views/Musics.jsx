@@ -14,24 +14,21 @@ import debounce from "just-debounce-it";
 
 export default function Musics() {
     const [songs, setSongs] = useState(null);
-    const [pageUrl, setPageUrl] = useState("");
     const [loading, setLoading] = useState(false);
-    const [search, setSearch] = useState("");
 
-    useEffect(() => {
+    const handlePagination = (url) => {
         setLoading(true);
-        getSongs(pageUrl).then((response) => {
+        getSongs(url).then((response) => {
             setLoading(false);
             setSongs(response);
         });
-    }, [pageUrl]);
+    };
 
     const debounceSearch = useCallback(
-        debounce((search) => {
-            console.log("Buscando:");
+        debounce((search, url) => {
+            if (!search) return handlePagination("");
             setLoading(true);
-            setPageUrl("");
-            searchSongs(pageUrl, { search }).then((response) => {
+            searchSongs(url, search).then((response) => {
                 setLoading(false);
                 setSongs(response);
             });
@@ -39,14 +36,19 @@ export default function Musics() {
         []
     );
 
+    const handleSearch = (e) => {
+        const search = e.target.value;
+        debounceSearch(search, "");
+    };
+
     useEffect(() => {
-        debounceSearch(search);
-    }, [search]); // eslint-disable-line react-hooks/exhaustive-deps
+        handlePagination("");
+    }, []);
 
     return (
         <PageContent className="flex flex-col gap-5 px-[--pdd]">
             <section className="container flex items-center flex-col gap-3">
-                <Search value={search} onChange={(e) => setSearch(e.target.value)} />
+                <Search onChange={(e) => handleSearch(e)} />
             </section>
             <section className="container flex items-center flex-col gap-3">
                 {songs?.data?.map((song) => (
@@ -64,9 +66,7 @@ export default function Musics() {
             <section className="container flex justify-center gap-2 pt-5 pb-10">
                 {songs?.prev_page_url && (
                     <Button
-                        onClick={() => {
-                            setPageUrl(songs?.prev_page_url);
-                        }}
+                        onClick={() => handlePagination(songs?.prev_page_url)}
                         icon={faChevronLeft}
                         disabled={loading}
                     />
@@ -74,9 +74,7 @@ export default function Musics() {
                 <Button text={songs?.current_page} disabled />
                 {songs?.next_page_url && (
                     <Button
-                        onClick={() => {
-                            setPageUrl(songs?.next_page_url);
-                        }}
+                        onClick={() => handlePagination(songs?.next_page_url)}
                         icon={faChevronRight}
                         disabled={loading}
                     />
@@ -112,7 +110,7 @@ function Item({ to, number, title, artist, genre }) {
     );
 }
 
-function Search({ value, onChange }) {
+function Search({ onChange }) {
     return (
         <div className="flex flex-col sm:flex-row gap-2 items-center w-full max-w-[800px]">
             <label className="font-bold tracking-wide">Busca una canción: </label>
@@ -121,7 +119,6 @@ function Search({ value, onChange }) {
                     className="flex-1 bg-transparent py-3 outline-none"
                     placeholder="Nombre, artista o genero"
                     type="text"
-                    value={value}
                     onChange={onChange}
                 />
                 <FontAwesomeIcon className="opacity-80" icon={faSearch} />
