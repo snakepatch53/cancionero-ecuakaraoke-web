@@ -55,7 +55,7 @@ export default function Musics() {
                     <Item
                         key={song.id}
                         number={song.id}
-                        to={"/new/1" + song.id}
+                        to={"/new/" + song.id}
                         title={song.title}
                         artist={song.artist}
                         genre={song.gender}
