@@ -23,7 +23,7 @@ export default function Home() {
                 {orders?.data?.map((order) => (
                     <Item
                         key={order.id}
-                        number={order.id}
+                        number={order?.song?.id}
                         title={order?.song?.artist + " - " + order?.song?.title}
                         by={order?.client?.name}
                         date={order.date_str}
