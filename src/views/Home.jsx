@@ -16,6 +16,14 @@ export default function Home() {
             setLoading(false);
             setOrders(response);
         });
+
+        const interval = setInterval(() => {
+            getOrders(pageUrl).then((response) => {
+                setOrders(response);
+            });
+        }, 10000);
+
+        return () => clearInterval(interval);
     }, [pageUrl]);
     return (
         <PageContent className="px-[--pdd] pt-5">
